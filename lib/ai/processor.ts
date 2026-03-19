@@ -7,7 +7,7 @@
 // - Use Promise.allSettled NOT Promise.all — one failed call shouldn't kill the batch
 // - Log errors per-mention but continue processing the rest
 
-import { aiClient, BULK_MODEL, SUMMARY_MODEL } from './client';
+import { getAiClient, BULK_MODEL, SUMMARY_MODEL } from './client';
 import { SENTIMENT_SYSTEM_PROMPT, SUMMARY_SYSTEM_PROMPT } from './prompts';
 import {
   getUnprocessedMentions,
@@ -30,7 +30,7 @@ const BATCH_SIZE = 50;
  */
 async function analyzeMentionSentiment(mention: Mention): Promise<MentionAIResult | null> {
   try {
-    const response = await aiClient.chat.completions.create({
+    const response = await getAiClient().chat.completions.create({
       model: BULK_MODEL,
       messages: [
         { role: 'system', content: SENTIMENT_SYSTEM_PROMPT },
@@ -151,7 +151,7 @@ export async function generateVenueSummary(venueId: string): Promise<boolean> {
     .join('\n');
 
   try {
-    const response = await aiClient.chat.completions.create({
+    const response = await getAiClient().chat.completions.create({
       model: SUMMARY_MODEL,
       messages: [
         { role: 'system', content: SUMMARY_SYSTEM_PROMPT },

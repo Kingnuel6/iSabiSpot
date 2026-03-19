@@ -5,19 +5,21 @@
 
 import OpenAI from 'openai';
 
-if (!process.env.OPENROUTER_API_KEY) {
-  throw new Error('Missing OPENROUTER_API_KEY in .env.local');
+// getAiClient() — call this inside API routes/server functions, never at module level
+// This prevents Vercel build failures when server env vars aren't available at build time
+export function getAiClient(): OpenAI {
+  if (!process.env.OPENROUTER_API_KEY) {
+    throw new Error('Missing OPENROUTER_API_KEY. Set it in Vercel project settings.');
+  }
+  return new OpenAI({
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: process.env.OPENROUTER_API_KEY,
+    defaultHeaders: {
+      'HTTP-Referer': 'https://isabispot.com',
+      'X-Title': 'iSabiSpot',
+    },
+  });
 }
-
-export const aiClient = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    // OpenRouter requires these for rate limiting and analytics
-    'HTTP-Referer': 'https://isabispot.com',
-    'X-Title': 'iSabiSpot',
-  },
-});
 
 // ─── Model constants ──────────────────────────────────────────────────────────
 
